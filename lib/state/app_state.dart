@@ -15,6 +15,10 @@ class AppState extends ChangeNotifier {
   List<Quote> quotes = List.from(seedQuotes);
 
   AppUser currentUser = AppUser(name: "Guest");
+  Quote? currentBlankQuote;
+  String currentBlankWord = "";
+  String currentMaskedText = "";
+  List<String> currentBlankOptions = [];
 
   void login(String name) {
     final trimmed = name.trim();
@@ -241,6 +245,85 @@ class AppState extends ChangeNotifier {
     currentUser.gameStreak = 0;
 
     nextGameQuestion();
+  }
+
+  String _cleanWord(String word) => word.replaceAll(RegExp(r'[^\w]'), '');
+
+  void nextCompleteQuoteQuestion() {
+    final published = quotes
+        .where((q) => q.status == QuoteStatus.published)
+        .toList();
+
+    final eligible = published
+        .where((q) => q.text.split(' ').any((w) => _cleanWord(w).length >= 4))
+        .toList();
+
+    if (eligible.isEmpty) {
+      currentBlankQuote = null;
+      notifyListeners();
+      return;
+    }
+
+    eligible.shuffle();
+    final quote = eligible.first;
+
+    final words = quote.text.split(' ');
+
+    final candidateIndices = <int>[
+      for (int i = 0; i < words.length; i++)
+        if (_cleanWord(words[i]).length >= 4) i,
+    ]..shuffle();
+
+    final blankIndex = candidateIndices.first;
+    final cleanWord = _cleanWord(words[blankIndex]);
+
+    currentBlankQuote = quote;
+    currentBlankWord = cleanWord;
+
+    final maskedWords = List<String>.from(words);
+    maskedWords[blankIndex] = "_" * cleanWord.length;
+    currentMaskedText = maskedWords.join(' ');
+
+    final wordPool = <String>{};
+    for (final q in quotes) {
+      for (final w in q.text.split(' ')) {
+        final c = _cleanWord(w);
+        if (c.length >= 4 && c.toLowerCase() != cleanWord.toLowerCase()) {
+          wordPool.add(c);
+        }
+      }
+    }
+
+    final distractors = wordPool.toList()..shuffle();
+
+    final options = <String>{cleanWord, ...distractors.take(2)}.toList();
+
+    while (options.length < 3) {
+      options.add("mystery${options.length}");
+    }
+
+    options.shuffle();
+    currentBlankOptions = options;
+
+    notifyListeners();
+  }
+
+  bool answerCompleteQuote(String picked) {
+    final correct = picked.toLowerCase() == currentBlankWord.toLowerCase();
+
+    if (correct) {
+      currentUser.gameStreak++;
+
+      final points = 10 + currentUser.gameStreak * 2;
+
+      currentUser.gameScore += points;
+      currentUser.xp += points;
+    } else {
+      currentUser.gameStreak = 0;
+    }
+
+    notifyListeners();
+    return correct;
   }
 
   bool isDarkMode = false;

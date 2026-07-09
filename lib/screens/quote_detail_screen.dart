@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'author_detail_screen.dart';
 import '../models/quote.dart';
 import '../state/app_state.dart';
 import '../utils/responsive.dart';
@@ -49,88 +49,100 @@ class QuoteDetailScreen extends StatelessWidget {
         child: ResponsiveCenter(
           maxWidth: 700,
           child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
 
-          children: [
-            Hero(
-              tag: "quote_${quote.id}",
+            children: [
+              Hero(
+                tag: "quote_${quote.id}",
 
-              child: Material(
-                color: Colors.transparent,
+                child: Material(
+                  color: Colors.transparent,
 
-                child: Card(
-                  elevation: 4,
+                  child: Card(
+                    elevation: 4,
 
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
 
-                    child: Text(
-                      quote.text,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                      child: Text(
+                        quote.text,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            const Text("Author", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                "Author",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-            ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.person)),
-              title: Text(author.name),
-              subtitle: Text(author.bio),
-            ),
+              ListTile(
+                leading: const CircleAvatar(child: Icon(Icons.person)),
+                title: Text(author.name),
+                subtitle: Text(author.bio),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AuthorDetailScreen(author: author),
+                    ),
+                  );
+                },
+              ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            const Text(
-              "Categories",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+              const Text(
+                "Categories",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
 
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            Wrap(
-              spacing: 10,
-              children: categories.map((category) {
-                return Chip(label: Text(category.name));
-              }).toList(),
-            ),
+              Wrap(
+                spacing: 10,
+                children: categories.map((category) {
+                  return Chip(label: Text(category.name));
+                }).toList(),
+              ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            ElevatedButton.icon(
-              onPressed: () {
-                openAuthorPage(author.name);
-              },
-              icon: const Icon(Icons.public),
-              label: const Text("Learn More"),
-            ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  openAuthorPage(author.name);
+                },
+                icon: const Icon(Icons.public),
+                label: const Text("Learn More"),
+              ),
 
-            const SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-            ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Audio coming soon")),
-                );
-              },
-              icon: const Icon(Icons.volume_up),
-              label: const Text("Play Audio"),
-            ),
-          ],
-        ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Audio coming soon")),
+                  );
+                },
+                icon: const Icon(Icons.volume_up),
+                label: const Text("Play Audio"),
+              ),
+            ],
+          ),
         ),
       ),
     );

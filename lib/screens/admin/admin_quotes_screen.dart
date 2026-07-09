@@ -5,6 +5,7 @@ import '../../models/author.dart';
 import '../../models/category.dart';
 import '../../models/quote.dart';
 import '../../state/app_state.dart';
+import '../../utils/responsive.dart';
 
 class ManageQuotesScreen extends StatelessWidget {
   const ManageQuotesScreen({super.key});
@@ -21,53 +22,56 @@ class ManageQuotesScreen extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
 
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: app.quotes.length,
-        itemBuilder: (_, index) {
-          final quote = app.quotes[index];
-          final author = app.authorOf(quote.authorId);
+      body: ResponsiveCenter(
+        maxWidth: 800,
+        child: ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: app.quotes.length,
+          itemBuilder: (_, index) {
+            final quote = app.quotes[index];
+            final author = app.authorOf(quote.authorId);
 
-          return Card(
-            child: ListTile(
-              title: Text(
-                quote.text,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+            return Card(
+              child: ListTile(
+                title: Text(
+                  quote.text,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+
+                subtitle: Text(author?.name ?? "Unknown"),
+
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      quote.status == QuoteStatus.published
+                          ? Icons.public
+                          : Icons.edit_note,
+                      color: quote.status == QuoteStatus.published
+                          ? Colors.green
+                          : Colors.orange,
+                    ),
+
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        _showQuoteDialog(context, quote: quote);
+                      },
+                    ),
+
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        app.deleteQuote(quote.id);
+                      },
+                    ),
+                  ],
+                ),
               ),
-
-              subtitle: Text(author?.name ?? "Unknown"),
-
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    quote.status == QuoteStatus.published
-                        ? Icons.public
-                        : Icons.edit_note,
-                    color: quote.status == QuoteStatus.published
-                        ? Colors.green
-                        : Colors.orange,
-                  ),
-
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      _showQuoteDialog(context, quote: quote);
-                    },
-                  ),
-
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      app.deleteQuote(quote.id);
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -81,18 +85,26 @@ class ManageQuotesScreen extends StatelessWidget {
 
     QuoteStatus status = quote?.status ?? QuoteStatus.draft;
 
+    bool hasImage = quote?.hasImage ?? false;
+    bool hasAudio = quote?.hasAudio ?? false;
+
     List<String> selectedCategories = List.from(quote?.categoryIds ?? []);
 
     showDialog(
       context: context,
-      builder: (_) {
+      builder: (dialogContext) {
+        // Cap dialog width on desktop/web, but never exceed 90% of a
+        // narrow phone screen.
+        final screenWidth = MediaQuery.of(dialogContext).size.width;
+        final dialogWidth = screenWidth < 480 ? screenWidth * 0.9 : 450.0;
+
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
               title: Text(quote == null ? "Add Quote" : "Edit Quote"),
 
               content: SizedBox(
-                width: 450,
+                width: dialogWidth,
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -105,7 +117,7 @@ class ManageQuotesScreen extends StatelessWidget {
                       const SizedBox(height: 20),
 
                       DropdownButtonFormField<String>(
-                        initialValue: selectedAuthor,
+                        value: selectedAuthor,
                         decoration: const InputDecoration(labelText: "Author"),
                         items: app.authors
                             .map(
@@ -158,7 +170,7 @@ class ManageQuotesScreen extends StatelessWidget {
                       const SizedBox(height: 20),
 
                       DropdownButtonFormField<QuoteStatus>(
-                        initialValue: status,
+                        value: status,
                         decoration: const InputDecoration(labelText: "Status"),
                         items: QuoteStatus.values
                             .map(
@@ -171,6 +183,26 @@ class ManageQuotesScreen extends StatelessWidget {
                         onChanged: (value) {
                           setState(() {
                             status = value!;
+                          });
+                        },
+                      ),
+
+                      SwitchListTile(
+                        value: hasImage,
+                        title: const Text("Has Image"),
+                        onChanged: (value) {
+                          setState(() {
+                            hasImage = value;
+                          });
+                        },
+                      ),
+
+                      SwitchListTile(
+                        value: hasAudio,
+                        title: const Text("Has Audio"),
+                        onChanged: (value) {
+                          setState(() {
+                            hasAudio = value;
                           });
                         },
                       ),
@@ -201,6 +233,10 @@ class ManageQuotesScreen extends StatelessWidget {
                       authorId: selectedAuthor!,
 
                       categoryIds: selectedCategories,
+
+                      hasImage: hasImage,
+
+                      hasAudio: hasAudio,
 
                       status: status,
                     );
