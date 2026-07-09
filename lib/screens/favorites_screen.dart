@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/quote.dart';
 import '../state/app_state.dart';
+import '../utils/responsive.dart';
 import '../widgets/quote_card.dart';
 import 'quote_detail_screen.dart';
 
@@ -22,33 +23,44 @@ class FavoritesScreen extends StatelessWidget {
 
       body: favorites.isEmpty
           ? const Center(child: Text("No favorite quotes yet."))
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final columns = responsiveColumns(constraints.maxWidth);
 
-              itemCount: favorites.length,
+                return ResponsiveCenter(
+                  maxWidth: 1000,
+                  padding: const EdgeInsets.all(16),
+                  child: GridView.builder(
+                    itemCount: favorites.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columns,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      mainAxisExtent: 200,
+                    ),
+                    itemBuilder: (_, index) {
+                      final quote = favorites[index];
 
-              itemBuilder: (_, index) {
-                final quote = favorites[index];
+                      final author = app.authorOf(quote.authorId)!;
 
-                final author = app.authorOf(quote.authorId)!;
-
-                return QuoteCard(
-                  quote: quote,
-                  author: author,
-                  favorite: true,
-
-                  onFavorite: () {
-                    app.toggleFavorite(quote.id);
-                  },
-
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => QuoteDetailScreen(quote: quote),
-                      ),
-                    );
-                  },
+                      return QuoteCard(
+                        quote: quote,
+                        author: author,
+                        favorite: true,
+                        onFavorite: () {
+                          app.toggleFavorite(quote.id);
+                        },
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => QuoteDetailScreen(quote: quote),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),

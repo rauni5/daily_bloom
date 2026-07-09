@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
 
+import '../utils/responsive.dart';
 import 'favorites_screen.dart';
 import 'game_screen.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
+
+class _NavItem {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+
+  const _NavItem(this.icon, this.selectedIcon, this.label);
+}
+
+const _navItems = [
+  _NavItem(Icons.home_outlined, Icons.home, "Home"),
+  _NavItem(Icons.favorite_border, Icons.favorite, "Favorites"),
+  _NavItem(Icons.quiz_outlined, Icons.quiz, "Game"),
+  _NavItem(Icons.person_outline, Icons.person, "Profile"),
+];
 
 class RootShell extends StatefulWidget {
   const RootShell({super.key});
@@ -22,43 +38,60 @@ class _RootShellState extends State<RootShell> {
     ProfileScreen(),
   ];
 
+  void _select(int value) {
+    setState(() {
+      currentIndex = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: pages[currentIndex],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth >= Breakpoints.tablet;
 
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
+        if (wide) {
+          return Scaffold(
+            body: Row(
+              children: [
+                NavigationRail(
+                  selectedIndex: currentIndex,
+                  labelType: NavigationRailLabelType.all,
+                  onDestinationSelected: _select,
+                  destinations: _navItems
+                      .map(
+                        (item) => NavigationRailDestination(
+                          icon: Icon(item.icon),
+                          selectedIcon: Icon(item.selectedIcon),
+                          label: Text(item.label),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(child: pages[currentIndex]),
+              ],
+            ),
+          );
+        }
 
-        onDestinationSelected: (value) {
-          setState(() {
-            currentIndex = value;
-          });
-        },
-
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: "Home",
+        return Scaffold(
+          body: pages[currentIndex],
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: currentIndex,
+            onDestinationSelected: _select,
+            destinations: _navItems
+                .map(
+                  (item) => NavigationDestination(
+                    icon: Icon(item.icon),
+                    selectedIcon: Icon(item.selectedIcon),
+                    label: item.label,
+                  ),
+                )
+                .toList(),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.favorite_border),
-            selectedIcon: Icon(Icons.favorite),
-            label: "Favorites",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.quiz_outlined),
-            selectedIcon: Icon(Icons.quiz),
-            label: "Game",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: "Profile",
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

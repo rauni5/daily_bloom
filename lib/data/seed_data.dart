@@ -6,51 +6,46 @@ final List<Category> seedCategories = [
   Category(
     id: "cat1",
     name: "Motivation",
-    icon: "💪",
+    icon: "",
     description: "Daily motivation",
   ),
 
   Category(
     id: "cat2",
     name: "Mindfulness",
-    icon: "🧘",
+    icon: "",
     description: "Inner peace",
   ),
 
-  Category(id: "cat3", name: "Love", icon: "❤️", description: "Relationships"),
+  Category(id: "cat3", name: "Love", icon: "", description: "Relationships"),
 
   Category(
     id: "cat4",
     name: "Success",
-    icon: "🏆",
+    icon: "",
     description: "Achieving goals",
   ),
 
   Category(
     id: "cat5",
     name: "Grief & Healing",
-    icon: "🌧",
+    icon: "",
     description: "Healing journey",
   ),
 
-  Category(
-    id: "cat6",
-    name: "Humor",
-    icon: "😂",
-    description: "Smile every day",
-  ),
+  Category(id: "cat6", name: "Humor", icon: "", description: "Smile every day"),
 
   Category(
     id: "cat7",
     name: "Stoicism",
-    icon: "🏛",
+    icon: "",
     description: "Ancient wisdom",
   ),
 
   Category(
     id: "cat8",
     name: "Nature",
-    icon: "🌿",
+    icon: "",
     description: "Calm and growth",
   ),
 ];
@@ -91,8 +86,6 @@ final List<Quote> seedQuotes = [
     text: "You have power over your mind, not outside events.",
     authorId: "a1",
     categoryIds: ["cat7"],
-    hasImage: true,
-    hasAudio: true,
     status: QuoteStatus.published,
   ),
 
@@ -101,7 +94,6 @@ final List<Quote> seedQuotes = [
     text: "Breathing in, I calm body and mind.",
     authorId: "a2",
     categoryIds: ["cat2"],
-    hasImage: true,
     status: QuoteStatus.published,
   ),
 

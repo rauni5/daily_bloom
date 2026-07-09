@@ -15,6 +15,15 @@ class AppState extends ChangeNotifier {
   List<Quote> quotes = List.from(seedQuotes);
 
   AppUser currentUser = AppUser(name: "Guest");
+
+  void login(String name) {
+    final trimmed = name.trim();
+
+    currentUser = AppUser(name: trimmed.isEmpty ? "Guest" : trimmed);
+
+    notifyListeners();
+  }
+
   void addCategory(Category category) {
     categories.add(category);
 

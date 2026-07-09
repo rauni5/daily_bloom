@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../state/app_state.dart';
+import '../utils/responsive.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -24,7 +25,9 @@ class ProfileScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(20),
 
-        child: Column(
+        child: ResponsiveCenter(
+          maxWidth: 600,
+          child: Column(
           children: [
             const CircleAvatar(radius: 45, child: Icon(Icons.person, size: 45)),
 
@@ -90,6 +93,7 @@ class ProfileScreen extends StatelessWidget {
               onTap: openGithub,
             ),
           ],
+        ),
         ),
       ),
     );

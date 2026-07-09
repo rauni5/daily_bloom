@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'auth_screen.dart';
 
@@ -55,7 +54,17 @@ class _SplashScreenState extends State<SplashScreen>
       body: Center(
         child: ScaleTransition(
           scale: _animation,
-          child: Text("🌿", style: TextStyle(fontSize: 70.sp)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset("assets/icon/app_icon.png", width: 100, height: 100),
+              const SizedBox(height: 16),
+              const Text(
+                "Daily Bloom",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -27,7 +27,7 @@ class QuoteCard extends StatelessWidget {
     return Hero(
       tag: "quote_${quote.id}",
       child: Card(
-        margin: const EdgeInsets.only(bottom: 16),
+        margin: const EdgeInsets.only(bottom: 10),
         elevation: 3,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         child: InkWell(

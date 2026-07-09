@@ -1,8 +1,10 @@
 import 'package:daily_bloom/screens/root.dart';
+import 'package:daily_bloom/state/app_state.dart';
 import 'package:daily_bloom/widgets/textfield.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
+import '../utils/responsive.dart';
 import '../widgets/primary_button.dart';
 import 'preference_picker_screen.dart';
 
@@ -35,12 +37,17 @@ class _AuthScreenState extends State<AuthScreen> {
   void submit() {
     if (!formKey.currentState!.validate()) return;
 
+    final app = context.read<AppState>();
+
     if (isLogin) {
+      final fallbackName = emailController.text.split("@").first;
+      app.login(fallbackName);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const RootShell()),
       );
     } else {
+      app.login(nameController.text);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const PreferencePickerScreen()),
@@ -54,127 +61,130 @@ class _AuthScreenState extends State<AuthScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 25.w),
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  Icon(Icons.spa_rounded, size: 80.sp, color: Colors.green),
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: ResponsiveCenter(
+              maxWidth: 420,
+              child: Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    Icon(Icons.spa_rounded, size: 80, color: Colors.green),
 
-                  SizedBox(height: 15.h),
+                    SizedBox(height: 15),
 
-                  Text(
-                    "Daily Bloom",
-                    style: TextStyle(
-                      fontSize: 32.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  SizedBox(height: 8.h),
-
-                  Text(
-                    "Find inspiration every day.",
-                    style: TextStyle(fontSize: 15.sp, color: Colors.grey),
-                  ),
-
-                  SizedBox(height: 35.h),
-
-                  if (!isLogin)
-                    Column(
-                      children: [
-                        CustomTextField(
-                          label: "Full Name",
-                          controller: nameController,
-                          icon: Icons.person,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Enter your name";
-                            }
-                            return null;
-                          },
-                        ),
-
-                        SizedBox(height: 18.h),
-                      ],
+                    Text(
+                      "Daily Bloom",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
 
-                  CustomTextField(
-                    label: "Email",
-                    controller: emailController,
-                    icon: Icons.email,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Enter email";
-                      }
+                    SizedBox(height: 8),
 
-                      if (!value.contains("@")) {
-                        return "Invalid email";
-                      }
-
-                      return null;
-                    },
-                  ),
-
-                  SizedBox(height: 18.h),
-
-                  CustomTextField(
-                    label: "Password",
-                    controller: passwordController,
-                    obscure: true,
-                    icon: Icons.lock,
-                    validator: (value) {
-                      if (value == null || value.length < 6) {
-                        return "Password must be at least 6 characters";
-                      }
-
-                      return null;
-                    },
-                  ),
-
-                  if (!isLogin)
-                    Column(
-                      children: [
-                        SizedBox(height: 18.h),
-
-                        CustomTextField(
-                          label: "Confirm Password",
-                          controller: confirmPasswordController,
-                          obscure: true,
-                          icon: Icons.lock_outline,
-                          validator: (value) {
-                            if (value != passwordController.text) {
-                              return "Passwords don't match";
-                            }
-
-                            return null;
-                          },
-                        ),
-                      ],
+                    Text(
+                      "Find inspiration every day.",
+                      style: TextStyle(fontSize: 15, color: Colors.grey),
                     ),
 
-                  SizedBox(height: 30.h),
+                    SizedBox(height: 35),
 
-                  PrimaryButton(
-                    title: isLogin ? "Login" : "Create Account",
-                    onPressed: submit,
-                  ),
+                    if (!isLogin)
+                      Column(
+                        children: [
+                          CustomTextField(
+                            label: "Full Name",
+                            controller: nameController,
+                            icon: Icons.person,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Enter your name";
+                              }
+                              return null;
+                            },
+                          ),
 
-                  SizedBox(height: 20.h),
+                          SizedBox(height: 18),
+                        ],
+                      ),
 
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        isLogin = !isLogin;
-                      });
-                    },
-                    child: Text(
-                      isLogin
-                          ? "Don't have an account? Sign Up"
-                          : "Already have an account? Login",
+                    CustomTextField(
+                      label: "Email",
+                      controller: emailController,
+                      icon: Icons.email,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Enter email";
+                        }
+
+                        if (!value.contains("@")) {
+                          return "Invalid email";
+                        }
+
+                        return null;
+                      },
                     ),
-                  ),
-                ],
+
+                    SizedBox(height: 18),
+
+                    CustomTextField(
+                      label: "Password",
+                      controller: passwordController,
+                      obscure: true,
+                      icon: Icons.lock,
+                      validator: (value) {
+                        if (value == null || value.length < 6) {
+                          return "Password must be at least 6 characters";
+                        }
+
+                        return null;
+                      },
+                    ),
+
+                    if (!isLogin)
+                      Column(
+                        children: [
+                          SizedBox(height: 18),
+
+                          CustomTextField(
+                            label: "Confirm Password",
+                            controller: confirmPasswordController,
+                            obscure: true,
+                            icon: Icons.lock_outline,
+                            validator: (value) {
+                              if (value != passwordController.text) {
+                                return "Passwords don't match";
+                              }
+
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+
+                    SizedBox(height: 30),
+
+                    PrimaryButton(
+                      title: isLogin ? "Login" : "Create Account",
+                      onPressed: submit,
+                    ),
+
+                    SizedBox(height: 20),
+
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          isLogin = !isLogin;
+                        });
+                      },
+                      child: Text(
+                        isLogin
+                            ? "Don't have an account? Sign Up"
+                            : "Already have an account? Login",
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

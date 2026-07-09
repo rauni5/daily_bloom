@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../state/app_state.dart';
+import '../utils/responsive.dart';
 import '../widgets/quote_card.dart';
 import 'quote_detail_screen.dart';
 
@@ -42,87 +43,113 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text("Daily Bloom")),
 
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final columns = responsiveColumns(constraints.maxWidth);
 
-        children: [
-          const Text("Good Morning 👋", style: TextStyle(fontSize: 16)),
+          return ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              ResponsiveCenter(
+                maxWidth: 1000,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Good Morning 👋",
+                      style: TextStyle(fontSize: 16),
+                    ),
 
-          const SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
-          const Text(
-            "Today's Inspiration",
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-          ),
+                    const Text(
+                      "Today's Inspiration",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
 
-          const SizedBox(height: 25),
+                    const SizedBox(height: 25),
 
-          TextField(
-            controller: searchController,
-            decoration: const InputDecoration(
-              hintText: "Search quotes...",
-              prefixIcon: Icon(Icons.search),
-            ),
-            onChanged: (_) {
-              setState(() {});
-            },
-          ),
+                    TextField(
+                      controller: searchController,
+                      decoration: const InputDecoration(
+                        hintText: "Search quotes...",
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                      onChanged: (_) {
+                        setState(() {});
+                      },
+                    ),
 
-          const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-          SizedBox(
-            height: 50,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: app.categories.map((category) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: CategoryCard(
-                    title: category.name,
-                    selected: selectedCategory == category.id,
-                    onTap: () {
-                      setState(() {
-                        if (selectedCategory == category.id) {
-                          selectedCategory = "";
-                        } else {
-                          selectedCategory = category.id;
-                        }
-                      });
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
+                    SizedBox(
+                      height: 50,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: app.categories.map((category) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: CategoryCard(
+                              title: category.name,
+                              selected: selectedCategory == category.id,
+                              onTap: () {
+                                setState(() {
+                                  if (selectedCategory == category.id) {
+                                    selectedCategory = "";
+                                  } else {
+                                    selectedCategory = category.id;
+                                  }
+                                });
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
 
-          const SizedBox(height: 25),
+                    const SizedBox(height: 25),
 
-          ...quotes.map((quote) {
-            final author = app.authorOf(quote.authorId)!;
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: quotes.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columns,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        mainAxisExtent: 200,
+                      ),
+                      itemBuilder: (context, index) {
+                        final quote = quotes[index];
+                        final author = app.authorOf(quote.authorId)!;
 
-            return QuoteCard(
-              quote: quote,
-
-              author: author,
-
-              favorite: app.isFavorite(quote.id),
-
-              onFavorite: () {
-                app.toggleFavorite(quote.id);
-              },
-
-              onTap: () {
-                Navigator.push(
-                  context,
-
-                  MaterialPageRoute(
-                    builder: (_) => QuoteDetailScreen(quote: quote),
-                  ),
-                );
-              },
-            );
-          }),
-        ],
+                        return QuoteCard(
+                          quote: quote,
+                          author: author,
+                          favorite: app.isFavorite(quote.id),
+                          onFavorite: () {
+                            app.toggleFavorite(quote.id);
+                          },
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => QuoteDetailScreen(quote: quote),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

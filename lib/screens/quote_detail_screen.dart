@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/quote.dart';
 import '../state/app_state.dart';
+import '../utils/responsive.dart';
 
 class QuoteDetailScreen extends StatelessWidget {
   final Quote quote;
@@ -45,7 +46,9 @@ class QuoteDetailScreen extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
 
-        child: Column(
+        child: ResponsiveCenter(
+          maxWidth: 700,
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
@@ -127,6 +130,7 @@ class QuoteDetailScreen extends StatelessWidget {
               label: const Text("Play Audio"),
             ),
           ],
+        ),
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../state/app_state.dart';
+import '../utils/responsive.dart';
 
 class GameScreen extends StatelessWidget {
   const GameScreen({super.key});
@@ -24,7 +25,9 @@ class GameScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(20),
 
-        child: Column(
+        child: ResponsiveCenter(
+          maxWidth: 600,
+          child: Column(
           children: [
             Card(
               child: Padding(
@@ -70,6 +73,7 @@ class GameScreen extends StatelessWidget {
 
             Text("Streak: ${app.currentUser.gameStreak}"),
           ],
+        ),
         ),
       ),
     );
