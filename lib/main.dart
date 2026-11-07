@@ -1,3 +1,4 @@
+import 'package:daily_bloom/product/presentation/screens/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +41,7 @@ class DailyBloom extends StatelessWidget {
 
               themeMode: app.isDarkMode ? ThemeMode.dark : ThemeMode.light,
 
-              home: const SplashScreen(),
+              home: const ProductScreen(),
             );
           },
         );
